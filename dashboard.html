@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - EduQuantra SMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --dark-bg: #141416;
+            --dark-surface: #1E1E22;
+            --dark-border: #2B2B30;
+            --accent-orange: #FF7A00;
+            --accent-amber: #FFB800;
+            --canvas-bg: #F6F7F9;
+            --card-border: #ECEEF2;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dark-bg);
+            color: #18181B;
+            margin: 0;
+        }
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Left Dark Sidebar */
+        .sidebar {
+            width: 245px;
+            background-color: var(--dark-bg);
+            color: #A1A1AA;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+            flex-shrink: 0;
+        }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 1.25rem;
+            padding: 0 0.5rem 1.75rem 0.5rem;
+        }
+        .brand-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-amber));
+            color: #141416;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 0.95rem;
+            border-radius: 12px;
+            color: #A1A1AA;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+        .nav-item-link:hover {
+            background-color: var(--dark-surface);
+            color: #FFFFFF;
+        }
+        .nav-item-link.active {
+            background-color: #242429;
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+        .nav-item-link.active i {
+            background: var(--accent-orange);
+            color: #141416;
+            padding: 4px 6px;
+            border-radius: 7px;
+            font-size: 0.8rem;
+        }
+        .sidebar-promo {
+            margin-top: auto;
+            background: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 1.15rem;
+            text-align: center;
+        }
+        .promo-crown {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 122, 0, 0.15);
+            color: var(--accent-orange);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.6rem;
+        }
+        .btn-promo {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-amber));
+            color: #141416;
+            font-weight: 700;
+            font-size: 0.82rem;
+            border: none;
+            border-radius: 10px;
+            padding: 0.55rem 1rem;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+        }
+        /* Main Right Wrapper */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--dark-bg);
+            padding-right: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        /* Dark Topbar */
+        .topbar {
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.25rem;
+            color: #FFFFFF;
+        }
+        .search-box {
+            background: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 0.35rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 340px;
+        }
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: #FFFFFF;
+            font-size: 0.85rem;
+            width: 100%;
+            outline: none;
+        }
+        .topbar-pill {
+            background: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            color: #E4E4E7;
+            border-radius: 10px;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.82rem;
+        }
+        /* Rounded Light Content Canvas */
+        .content-canvas {
+            background-color: var(--canvas-bg);
+            border-radius: 24px;
+            padding: 1.75rem;
+            flex: 1;
+        }
+        .btn-dark-pill {
+            background-color: #18181B;
+            color: #FFFFFF;
+            border-radius: 12px;
+            padding: 0.55rem 1.1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .btn-dark-pill:hover {
+            background-color: #27272A;
+            color: #FFFFFF;
+        }
+        /* KPI Cards */
+        .kpi-card {
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.25rem;
+            height: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .kpi-card.featured {
+            background: linear-gradient(145deg, #18181B 0%, #24211E 100%);
+            color: #FFFFFF;
+            border: none;
+        }
+        .kpi-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+        }
+        .kpi-card.featured .kpi-icon {
+            background: rgba(255, 122, 0, 0.2);
+            color: var(--accent-orange);
+        }
+        .kpi-card:not(.featured) .kpi-icon {
+            background: #FFF4E8;
+            color: var(--accent-orange);
+        }
+        /* Dashboard Panels */
+        .panel-card {
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.35rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .quantra-input {
+            border-radius: 10px;
+            border: 1px solid #E4E4E7;
+            font-size: 0.88rem;
+            padding: 0.55rem 0.8rem;
+        }
+        .quantra-input:focus {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 0.2rem rgba(255, 122, 0, 0.15);
+        }
+        .table thead th {
+            background-color: #F9FAFB;
+            color: #71717A;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-bottom: 1px solid #ECEEF2;
+        }
+        .table tbody td {
+            font-size: 0.88rem;
+            border-bottom: 1px solid #F3F4F6;
+        }
+        .status-badge-pass {
+            background: #DCFCE7;
+            color: #15803D;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.65rem;
+            border-radius: 8px;
+        }
+        .status-badge-warn {
+            background: #FEF3C7;
+            color: #B45309;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.65rem;
+            border-radius: 8px;
+        }
+        @media (max-width: 992px) {
+            .sidebar { display: none; }
+            .main-wrapper { padding: 0; }
+            .content-canvas { border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <!-- Dark Left Sidebar -->
+    <aside class="sidebar">
+        <div class="brand-logo">
+            <div class="brand-badge"><i class="bi bi-bar-chart-fill"></i></div>
+            <span>EduQuantra</span>
+        </div>
+
+        <nav>
+            <a href="{% url 'dashboard' %}" class="nav-item-link active">
+                <i class="bi bi-grid-fill"></i> Dashboard
+            </a>
+            <a href="#analyticsSection" class="nav-item-link">
+                <i class="bi bi-graph-up"></i> Analytics
+            </a>
+            <a href="#enrollSection" class="nav-item-link">
+                <i class="bi bi-person-plus"></i> Enroll Student
+            </a>
+            <a href="#directorySection" class="nav-item-link">
+                <i class="bi bi-people"></i> Student Directory
+            </a>
+            <a href="{% url 'export_csv' %}" class="nav-item-link">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export Reports
+            </a>
+            <a href="/admin/" class="nav-item-link">
+                <i class="bi bi-gear"></i> Django Admin
+            </a>
+        </nav>
+
+        <div class="sidebar-promo">
+            <div class="promo-crown"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="text-white fw-semibold small mb-1">Academic Analytics</div>
+            <p class="small text-secondary mb-3" style="font-size: 0.76rem;">
+                Download full student performance &amp; passing rate CSV reports.
+            </p>
+            <a href="{% url 'export_csv' %}" class="btn-promo">Download Report &rarr;</a>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Dark Topbar -->
+        <header class="topbar">
+            <form method="get" class="search-box">
+                <i class="bi bi-search text-secondary"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search student ID, name, course...">
+                {% if query %}
+                    <a href="{% url 'dashboard' %}" class="text-secondary text-decoration-none small">&times;</a>
+                {% endif %}
+            </form>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="topbar-pill d-none d-md-flex align-items-center gap-2">
+                    <i class="bi bi-calendar3 text-warning"></i>
+                    <span>Academic Year 2026</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-warning text-dark fw-bold d-flex align-items-center justify-content-center" style="width:34px;height:34px;font-size:0.85rem;">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
+                    <div class="d-none d-sm-block lh-1">
+                        <div class="small fw-semibold">{{ request.user.username }}</div>
+                        <span class="text-secondary" style="font-size:0.72rem;">System Admin</span>
+                    </div>
+                </div>
+                <form action="{% url 'logout' %}" method="post" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-secondary text-white border-secondary" style="border-radius:10px;">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Light Rounded Content Canvas -->
+        <main class="content-canvas">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Header Row -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                <div>
+                    <h4 class="fw-bold mb-1">Student Dashboard</h4>
+                    <p class="text-muted small mb-0">Track student enrollment, course performance, and academic growth in real time.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'export_csv' %}" class="btn-dark-pill">
+                        <i class="bi bi-plus-lg"></i> Export Report
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4 KPI Cards Row (Dark Featured First Card + 3 White Cards) -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="kpi-card featured">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="kpi-icon"><i class="bi bi-people-fill"></i></div>
+                            <span class="badge bg-warning bg-opacity-25 text-warning">Active</span>
+                        </div>
+                        <div class="small text-secondary mb-1">Total Enrolled Students</div>
+                        <div class="d-flex align-items-end justify-content-between">
+                            <div>
+                                <h3 class="fw-bold mb-1">{{ total_students }}</h3>
+                                <span class="text-success small fw-semibold">&uarr; 100% Verified Records</span>
+                            </div>
+                            <canvas id="spark1" width="75" height="35"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="kpi-icon"><i class="bi bi-award-fill"></i></div>
+                            <i class="bi bi-three-dots-vertical text-muted"></i>
+                        </div>
+                        <div class="small text-muted mb-1">Overall Average Grade</div>
+                        <div class="d-flex align-items-end justify-content-between">
+                            <div>
+                                <h3 class="fw-bold mb-1">{{ overall_avg }}%</h3>
+                                <span class="text-success small fw-semibold">&uarr; Across all courses</span>
+                            </div>
+                            <canvas id="spark2" width="75" height="35"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="kpi-icon"><i class="bi bi-check-circle-fill"></i></div>
+                            <i class="bi bi-three-dots-vertical text-muted"></i>
+                        </div>
+                        <div class="small text-muted mb-1">Passing Rate (&ge; 75%)</div>
+                        <div class="d-flex align-items-end justify-content-between">
+                            <div>
+                                <h3 class="fw-bold mb-1">{{ passing_rate }}%</h3>
+                                <span class="text-success small fw-semibold">&uarr; Meeting standard</span>
+                            </div>
+                            <canvas id="spark3" width="75" height="35"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="kpi-icon"><i class="bi bi-star-fill"></i></div>
+                            <i class="bi bi-three-dots-vertical text-muted"></i>
+                        </div>
+                        <div class="small text-muted mb-1">Dean's List (&ge; 90%)</div>
+                        <div class="d-flex align-items-end justify-content-between">
+                            <div>
+                                <h3 class="fw-bold mb-1">{{ honor_count }}</h3>
+                                <span class="text-warning small fw-semibold">Top Performers</span>
+                            </div>
+                            <canvas id="spark4" width="75" height="35"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Row: Graphic Bar Chart + Donut Distribution -->
+            <div class="row g-3 mb-4" id="analyticsSection">
+                <div class="col-lg-8">
+                    <div class="panel-card h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="fw-bold mb-0">Course Performance &amp; Enrollment Bar Chart</h6>
+                                <span class="text-muted small">Comparing student headcount and average grade per program</span>
+                            </div>
+                            <span class="badge bg-light text-dark border">Live Data</span>
+                        </div>
+                        <canvas id="courseBarChart" height="125"></canvas>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel-card h-100 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0">Enrollment by Course</h6>
+                            <span class="badge bg-light text-dark border">Share</span>
+                        </div>
+                        <div style="max-width: 210px; margin: 0 auto;">
+                            <canvas id="courseDonutChart"></canvas>
+                        </div>
+                        <div class="mt-3">
+                            {% for item in course_breakdown %}
+                            <div class="d-flex justify-content-between align-items-center small py-1 border-bottom">
+                                <span class="text-muted">{{ item.course }}</span>
+                                <span class="fw-bold">{{ item.pct }}% ({{ item.total }})</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Enroll Form + Top Students + Full Directory -->
+            <div class="row g-3 mb-4" id="enrollSection">
+                <div class="col-lg-4">
+                    <div class="panel-card h-100">
+                        <h6 class="fw-bold mb-1">Enroll New Student</h6>
+                        <p class="text-muted small mb-3">Validated student record entry</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <div class="mb-2">
+                                    <label class="form-label small fw-semibold text-secondary mb-1">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            <button type="submit" class="btn-dark-pill w-100 justify-content-center mt-2">
+                                <i class="bi bi-check2-circle"></i> Save Student Record
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-8" id="directorySection">
+                    <div class="panel-card h-100">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                            <div>
+                                <h6 class="fw-bold mb-0">Student Directory</h6>
+                                <span class="text-muted small">Manage, filter, and update enrolled students</span>
+                            </div>
+                            <form method="get" class="d-flex gap-2">
+                                <select name="course" class="form-select form-select-sm quantra-input" onchange="this.form.submit()">
+                                    <option value="">All Courses</option>
+                                    {% for c in course_choices %}
+                                        <option value="{{ c }}" {% if selected_course == c %}selected{% endif %}>{{ c }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% if selected_course or query %}
+                                    <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                                {% endif %}
+                            </form>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Course</th>
+                                        <th>Grade</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold text-dark">{{ student.name }}</div>
+                                            <div class="text-muted small">{{ student.student_id }} &bull; {{ student.email }}</div>
+                                        </td>
+                                        <td><span class="badge bg-light text-dark border">{{ student.course }}</span></td>
+                                        <td class="fw-bold">{{ student.grade }}%</td>
+                                        <td>
+                                            {% if student.grade >= 75 %}
+                                                <span class="status-badge-pass">Passed</span>
+                                            {% else %}
+                                                <span class="status-badge-warn">Needs Review</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{% url 'edit_student' student.id %}" class="btn btn-sm btn-light border" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form action="{% url 'delete_student' student.id %}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ student.name }}?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-light border text-danger" title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">No student records match your filter.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const labels = {{ labels_json|safe }};
+    const counts = {{ counts_json|safe }};
+    const avgGrades = {{ avg_grades_json|safe }};
+
+    // Main Grouped Graphic Bar Chart (Orange & Dark Slate theme)
+    new Chart(document.getElementById('courseBarChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Enrolled Students',
+                    data: counts,
+                    backgroundColor: '#FF7A00',
+                    borderRadius: 8,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Average Grade (%)',
+                    data: avgGrades,
+                    backgroundColor: '#18181B',
+                    borderRadius: 8,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 },
+                    title: { display: true, text: 'Students' }
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { drawOnChartArea: false },
+                    title: { display: true, text: 'Avg Grade (%)' }
+                }
+            }
+        }
+    });
+
+    // Donut Chart (Course Share)
+    new Chart(document.getElementById('courseDonutChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: counts,
+                backgroundColor: ['#FF7A00', '#FFB800', '#18181B', '#A1A1AA'],
+                borderWidth: 2,
+                borderColor: '#FFFFFF'
+            }]
+        },
+        options: {
+            cutout: '68%',
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Mini KPI Sparklines
+    function drawSpark(id, pts) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        new Chart(el.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: pts.map((_, i) => i),
+                datasets: [{
+                    data: pts,
+                    borderColor: '#FF7A00',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    }
+    drawSpark('spark1', [4, 7, 6, 10, 9, 12]);
+    drawSpark('spark2', [80, 83, 82, 86, 85, 88]);
+    drawSpark('spark3', [75, 80, 82, 85, 88, 91]);
+    drawSpark('spark4', [2, 3, 2, 4, 4, 5]);
+</script>
+</body>
+</html>
